@@ -1,0 +1,65 @@
+<head>
+  <title>musical_fountain</title>
+  <!-- Meteor don't let us do <script/> so it has to be done in js. https://www.kaplankomputing.com/blog/tutorials/two-ways-to-add-a-script-tag-in-meteor/-->
+</head>
+
+<body>
+  {{> header}}
+  {{> content_area}}
+</body>
+
+<template name="header">
+  <div class="navbar navbar-default" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <a href="/" class="navbar-brand">Welcome to Meteor!</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li>
+            <a href="">News</a>
+          </li>
+          <li>
+            <a href="">Blog</a>
+          </li>
+          <li>
+            <a href="">Admin Area (must login)</a>
+          </li>
+          <li>
+            <a href="">Chatboard</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <!--{{> loginButtons}}-->
+          login
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="content_area">
+<div class="row">
+  <div class="col-md-8">
+    {{>fountain_area}}
+  </div>
+  <div class="col-md-4">
+    {{>music_area}}
+  </div>
+</div>
+</template>
+
+<template name="fountain_area">
+  <canvas id="fcanvas">
+  
+  </canvas>
+</template>
+
+<template name="music_area">
+  <div id='p5container'>
+    
+  </div>
+  <button type="button" class="btn btn-success" id="play_m">
+    Play
+  </button>
+</template>

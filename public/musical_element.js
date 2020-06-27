@@ -1,5 +1,4 @@
 import * as Tone from "tone";
-
 // musical elements
 var lowPass = new Tone.Filter({
     "frequency" : 14000,
@@ -81,7 +80,7 @@ var bleepEnvelope = new Tone.AmplitudeEnvelope({
     "sustain" : 0,
 }).toMaster();
 
-var bleep = new Tone.Oscillator("A4").connect(bleepEnvelope);
+var bleep = new Tone.Oscillator('A4').connect(bleepEnvelope);
 
 var bleepLoop = new Tone.Loop(function(time){
      bleepEnvelope.triggerAttack(time);
@@ -94,7 +93,9 @@ var kickEnvelope = new Tone.AmplitudeEnvelope({
     "sustain" : 0,
 }).toMaster();
 
-var kick = new Tone.Oscillator("A2").connect(kickEnvelope);
+var kick = new Tone.Oscillator("G2").connect(kickEnvelope);
+
+//bleep.connect(kickEnvelope);
 
 var kickSnapEnv = new Tone.FrequencyEnvelope({
     "attack" : 0.005,
@@ -107,10 +108,4 @@ var kickSnapEnv = new Tone.FrequencyEnvelope({
 var kickPart = new Tone.Part(function(time){
     kickEnvelope.triggerAttack(time);
     kickSnapEnv.triggerAttack(time);
-}, ["0", "0:0:3", "0:2:0", "0:3:1"]);
-
-var synth = new Tone.FMSynth().toMaster();
-
-var synpart = new Tone.Part(function(time, note){
-    synth.triggerAttackRelease(note, "8n", time);
-}, [[0, "C2"], ["0:2", "C3"], ["0:3:2", "G2"]]);
+}, ["0", "0:0:3", "0:2:2", "0:3:1"]);

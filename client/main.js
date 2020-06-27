@@ -4,15 +4,11 @@ import './main.html';
 import * as Tone from "tone";
 import p5 from '/public/p5.js'
 
-// musical elements
 var lowPass = new Tone.Filter({
     "frequency" : 14000,
 }).toMaster();
 
-//we can make our own hi hats with 
-//the noise synth and a sharp filter envelope
 var openHiHat = new Tone.NoiseSynth({
-    "volume" : -10,
     "filter" : {
         "Q" : 1
     },
@@ -34,7 +30,6 @@ var openHiHatPart = new Tone.Part(function(time){
 }, [{ "8n" : 2 }, { "8n" : 6 }]); //.start(0) on nusic template rendered
 
 var closedHiHat = new Tone.NoiseSynth({
-    "volume" : -10,
     "filter" : {
         "Q" : 1
     },
@@ -85,7 +80,7 @@ var bleepEnvelope = new Tone.AmplitudeEnvelope({
     "sustain" : 0,
 }).toMaster();
 
-var bleep = new Tone.Oscillator("A4").connect(bleepEnvelope);
+var bleep = new Tone.Oscillator('A4').connect(bleepEnvelope);
 
 var bleepLoop = new Tone.Loop(function(time){
      bleepEnvelope.triggerAttack(time);
@@ -98,7 +93,7 @@ var kickEnvelope = new Tone.AmplitudeEnvelope({
     "sustain" : 0,
 }).toMaster();
 
-var kick = new Tone.Oscillator("A2").connect(kickEnvelope);
+var kick = new Tone.Oscillator("G2").connect(kickEnvelope);
 
 //bleep.connect(kickEnvelope);
 
@@ -113,19 +108,19 @@ var kickSnapEnv = new Tone.FrequencyEnvelope({
 var kickPart = new Tone.Part(function(time){
     kickEnvelope.triggerAttack(time);
     kickSnapEnv.triggerAttack(time);
-}, ["0", "0:0:3", "0:2:0", "0:3:1"]);
-
-var synth = new Tone.FMSynth().toMaster();
-
-var synpart = new Tone.Part(function(time, note){
-    synth.triggerAttackRelease(note, "8n", time);
-}, [[0, "C2"], ["0:2", "C3"], ["0:3:2", "G2"]]);
-
+}, ["0", "0:0:3", "0:2:2", "0:3:1"]);
 
 Tone.Transport.loopStart = 0;
 Tone.Transport.loopEnd = "1:0";
 Tone.Transport.loop = true;
 //musical elements end
+
+// mixer elements
+var mixctrl1;
+var mixctrl2;
+var mixctrl3;
+var mixctrl4;
+var mixctrl5;
 
 // other parameters
 var music_start=0;
@@ -143,7 +138,7 @@ Template.fountain_area.onRendered(function() {
     ctx = canvas.getContext('2d');
 
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight*0.85;
 
     balls1 = [];
     balls2 = [];
@@ -162,7 +157,7 @@ Template.fountain_area.onRendered(function() {
         this.x = canvas.width / 2;
         this.y = 10;
         this.vx = Math.random() * 1 - 1;
-        this.vy = Math.random() * -2 - 5;
+        this.vy = Math.random() * -2 - 6;
         this.color = 'red';
     };
 
@@ -187,53 +182,26 @@ Template.fountain_area.onRendered(function() {
         requestAnimationFrame(drawFrame);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        mamp=kickEnvelope.value * 60+bassEnvelope.value*60;
-        console.log(mamp);
+        mamp1=(openHiHat.envelope.value*1+closedHiHat.envelope.value*0.3+bassEnvelope.value*0.3+bleepEnvelope.value*0.3+kickEnvelope.value*0.3)*(openHiHat.volume.value+40);
+        mamp2=(openHiHat.envelope.value*0.3+closedHiHat.envelope.value*1+bassEnvelope.value*0.3+bleepEnvelope.value*0.3+kickEnvelope.value*0.3)*(closedHiHat.volume.value+40);
+        mamp3=(openHiHat.envelope.value*0.3+closedHiHat.envelope.value*0.3+bassEnvelope.value*1+bleepEnvelope.value*0.3+kickEnvelope.value*0.3)*(bass.volume.value+10);
+        mamp4=(openHiHat.envelope.value*0.3+closedHiHat.envelope.value*0.3+bassEnvelope.value*0.3+bleepEnvelope.value*1+kickEnvelope.value*0.3)*(bleep.volume.value+10);
+        mamp5=(openHiHat.envelope.value*0.3+closedHiHat.envelope.value*0.3+bassEnvelope.value*0.3+bleepEnvelope.value*0.3+kickEnvelope.value*1)*(kick.volume.value+20);
+        console.log(bass.volume.value);
         balls1.forEach(function (item, index) {
-            if(mamp>0&&mamp<=15){  // count make the change of mamp1 do not instantly follow the mamp
-                mamp1=mamp;
-            } else
-            {
-                mamp1=0
-            }
-            draw_fountain(canvas.width*0.07,color1,item,mamp1*1.1)
+            draw_fountain(canvas.width*0.07,color1,item,mamp1)
         });
         balls2.forEach(function (item, index) {
-            if(mamp>10&&mamp<=30){  // count make the change of mamp1 do not instantly follow the mamp
-                mamp2=mamp;
-            } else
-            {
-                mamp2=0
-            }
-                draw_fountain(canvas.width*0.19,color2,item,mamp2*0.8)
-            //}
+            draw_fountain(canvas.width*0.19,color2,item,mamp2)
         });
         balls3.forEach(function (item, index) {
-            if(mamp>25){  // count make the change of mamp1 do not instantly follow the mamp
-                mamp3=mamp;
-            } else
-            {
-                mamp3=10
-            }
-            draw_fountain(canvas.width*0.31,color3,item,mamp3*0.8)
+            draw_fountain(canvas.width*0.31,color3,item,mamp3+10)
         });
         balls4.forEach(function (item, index) {
-            if(mamp>10&&mamp<=20){  // count make the change of mamp1 do not instantly follow the mamp
-                mamp2=mamp;
-            } else
-            {
-                mamp2=0
-            }
-            draw_fountain(canvas.width*0.43,color4,item,mamp2*0.8)
+            draw_fountain(canvas.width*0.43,color4,item,mamp4)
         });
         balls5.forEach(function (item, index) {
-            if(mamp>0&&mamp<=10){  // count make the change of mamp1 do not instantly follow the mamp
-                mamp1=mamp;
-            } else
-            {
-                mamp1=0
-            }
-            draw_fountain(canvas.width*0.55,color5,item,mamp1*1.1)
+            draw_fountain(canvas.width*0.55,color5,item,mamp5)
         });
 
         color1=color1+Math.random() * 2;
@@ -248,11 +216,17 @@ Template.fountain_area.onRendered(function() {
 
 Template.music_area.onRendered(function() {
     
+    mixctrl1 = document.getElementById("musical1");
+    mixctrl2 = document.getElementById("musical2");
+    mixctrl3 = document.getElementById("musical3");
+    mixctrl4 = document.getElementById("musical4");
+    mixctrl5 = document.getElementById("musical5");
+    
     var phase = 0;
 
     let sketch = function(p) {
         p.setup = function(){
-          p.createCanvas(window.innerWidth*0.31, window.innerHeight*0.7);
+          p.createCanvas(window.innerWidth*0.31, window.innerHeight*0.60);
           p.background(255);
           p.strokeWeight(1);
           p.rectMode(p.CENTER);
@@ -267,14 +241,17 @@ Template.music_area.onRendered(function() {
             for (var i = 10; i < window.innerWidth*0.31-10; i++){
                 //scaling kickEnvelope value by 200 
                 //since default is 0-1
-                var kickValue = kickEnvelope.value * 200;
-                var bassValue = bassEnvelope.value * 200;
+                var kickValue = kickEnvelope.value * 150*(kick.volume.value+20)/40;
+                var bassValue = bassEnvelope.value * 150*(bass.volume.value+10)/10;
+                var bleepValue = bleepEnvelope.value * 150*(bleep.volume.value+10)/10;
                 //multiplying this value to scale the sine wave 
                 //depending on x position
                 var yDot = Math.sin((i / 60) + phase) * kickValue;
                 var yDot2 = Math.sin((i / 60) + phase) * bassValue;
-                p.point(i, 500 -150 + yDot);
-                p.point(i, 500 -150 + yDot2);
+                var yDot3 = Math.sin((i / 60) + phase) * bleepValue;
+                p.point(i, 370 -150 + yDot);
+                p.point(i, 370 -150 + yDot2);
+                p.point(i, 370 -150 + yDot3);
             }
             //increasing phase means that the kick wave will 
             //not be standing and looks more dynamic
@@ -283,6 +260,12 @@ Template.music_area.onRendered(function() {
     };
 
     let p5_canvas = new p5(sketch,'p5container');
+
+    openHiHat.volume.setValueAtTime(-50,"0");
+    closedHiHat.volume.setValueAtTime(-50,"0");
+    bass.volume.setValueAtTime(-50,"0");
+    bleep.volume.setValueAtTime(-50,"0");
+    kick.volume.setValueAtTime(-50,"0");
 
     document.getElementById('play_m').addEventListener('click', function() {
 
@@ -294,6 +277,7 @@ Template.music_area.onRendered(function() {
         bleepLoop.start(0);
         kick.start(0);
         kickPart.start(0);
+        
         Tone.Transport.toggle(); // start parts
 
         console.log('Playback status change successfully');
@@ -306,6 +290,24 @@ Template.music_area.onRendered(function() {
         }
     });
     
+});
+
+Template.music_area.events({
+    'input .channel1'() { 
+        openHiHat.volume.setValueAtTime(mixctrl1.value*0.5-50, "0");//"0" represents instantly change the value, it is the time lag before change
+     },
+    'input .channel2'() { 
+        closedHiHat.volume.setValueAtTime(mixctrl2.value*0.5-50, "0");
+     },
+    'input .channel3'() { 
+        bass.volume.setValueAtTime(mixctrl3.value*0.4-30, "0");
+     },
+    'input .channel4'() { 
+        bleep.volume.setValueAtTime(mixctrl4.value*0.4-30, "0");
+     },
+    'input .channel5'() { 
+        kick.volume.setValueAtTime(mixctrl5.value*0.5-30, "0");
+     }
 });
 
 function draw_fountain(startloc,color,ball,kickValue) {
@@ -324,8 +326,11 @@ function draw_fountain(startloc,color,ball,kickValue) {
         ball.x = startloc;
         ball.y = canvas.height;
         ball.vx = Math.random() * 2 - 1;
-        ball.vy = Math.random() * -kickValue*1.3 - 7;
+        ball.vy = Math.random() * -kickValue*1.3-1;
     }
 
     ball.drawcir();
 };
+
+
+
